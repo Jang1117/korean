@@ -36,7 +36,7 @@
             gap: 10px;
         }
         h1 { color: #00f2fe; font-size: 22px; flex: 1; }
-        .back-button, .font-button {
+        .back-button, .font-button, .quiz-button {
             background: #e9ecef;
             border: none;
             border-radius: 8px;
@@ -51,7 +51,8 @@
             text-decoration: none;
         }
         .font-button { background: linear-gradient(135deg, #845ef7 0%, #7950f2 100%); color: white; }
-        .back-button:hover, .font-button:hover { transform: scale(1.08); }
+        .quiz-button { background: linear-gradient(135deg, #ff6b9d 0%, #ff5252 100%); color: white; }
+        .back-button:hover, .font-button:hover, .quiz-button:hover { transform: scale(1.08); }
         .category-selector {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -181,6 +182,10 @@
             max-height: 85vh;
             overflow-y: auto;
         }
+        .modal-content.quiz-modal {
+            max-width: 500px;
+            width: 100%;
+        }
         .modal-header {
             padding: 16px 20px;
             border-bottom: 2px solid #f1f3f5;
@@ -214,10 +219,206 @@
         .font-option.active { background: #00f2fe; color: white; border-color: #00f2fe; }
         .font-option-preview { font-size: 32px; margin: 8px 0; font-weight: bold; }
 
+        .quiz-item {
+            padding: 16px;
+            margin: 12px 0;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+        }
+        .quiz-sentence {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00f2fe;
+            margin-bottom: 8px;
+            font-family: var(--korean-font), Arial, sans-serif;
+        }
+        .quiz-romanization {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .quiz-english {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        .quiz-listen-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .quiz-listen-btn:hover {
+            background: linear-gradient(135deg, #40c057 0%, #37b24d 100%);
+            transform: translateY(-2px);
+        }
+        .quiz-listen-btn:active {
+            transform: translateY(0);
+        }
+        .modal-body {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        .quiz-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .quiz-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .quiz-progress-left {
+            text-align: left;
+        }
+        
+        .quiz-progress-right {
+            text-align: right;
+            color: #00f2fe;
+        }
+        
+        .quiz-canvas-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 50%;
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+        
+        #quizDrawingCanvas, #quizGuideCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #quizDrawingCanvas {
+            border: 3px solid #00f2fe;
+            border-radius: 10px;
+            background: white;
+            touch-action: none;
+            z-index: 2;
+        }
+        
+        #quizGuideCanvas {
+            opacity: 0;
+            pointer-events: none;
+            z-index: 3;
+        }
+        
+        .quiz-btn-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .quiz-btn-listen {
+            flex: 1;
+            padding: 14px;
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quiz-btn-answer {
+            flex: 1;
+            padding: 14px;
+            background: linear-gradient(135deg, #ffd43b 0%, #fcc419 100%);
+            color: #333;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quiz-btn-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .quiz-btn-correct {
+            padding: 14px;
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quiz-btn-wrong {
+            padding: 14px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff5252 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quiz-btn-next {
+            padding: 14px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quiz-btn-listen:hover, .quiz-btn-answer:hover, 
+        .quiz-btn-correct:hover, .quiz-btn-wrong:hover, 
+        .quiz-btn-next:hover {
+            transform: translateY(-2px);
+        }
+        
+        .quiz-btn-listen:active, .quiz-btn-answer:active,
+        .quiz-btn-correct:active, .quiz-btn-wrong:active,
+        .quiz-btn-next:active {
+            transform: translateY(0);
+        }
+
         @media (max-width: 480px) {
             .current-sentence { font-size: 26px; }
             .font-option-preview { font-size: 26px; }
             .sub-category-container { grid-template-columns: repeat(3, 1fr); }
+            .quiz-answer-korean { font-size: 20px; }
         }
     </style>
 </head>
@@ -225,8 +426,9 @@
 
 <div class="container">
     <div class="header">
-        <a href="index.html" class="back-button">←</a>
+        <a href="korean-index.html" class="back-button">←</a>
         <h1>Sentence Practice</h1>
+        <button class="quiz-button" id="quizBtn">Q</button>
         <button class="font-button" id="fontBtn">F</button>
     </div>
 
@@ -300,6 +502,38 @@
             <div class="font-option" data-font="'Gaegu'">
                 <div class="font-option-preview" style="font-family:'Gaegu';">안녕하세요</div>
                 <div>Gaegu</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 퀴즈 모달 -->
+<div class="modal-overlay" id="quizModal">
+    <div class="modal-content quiz-modal">
+        <div class="modal-header">
+            <h2>Listening Quiz</h2>
+            <button class="modal-close" id="quizModalClose">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="quiz-progress">
+                <div class="quiz-progress-left" id="quizProgressLeft">Question 1 / 5</div>
+                <div class="quiz-progress-right" id="quizProgressRight"></div>
+            </div>
+            
+            <div class="quiz-canvas-container">
+                <canvas id="quizDrawingCanvas"></canvas>
+                <canvas id="quizGuideCanvas"></canvas>
+            </div>
+            
+            <div class="quiz-btn-row">
+                <button class="quiz-btn-listen" id="quizListenBtn">🔊 Listen</button>
+                <button class="quiz-btn-answer" id="quizAnswerBtn">Answer</button>
+            </div>
+            
+            <div class="quiz-btn-row-2">
+                <button class="quiz-btn-correct" id="quizCorrectBtn">O</button>
+                <button class="quiz-btn-wrong" id="quizWrongBtn">X</button>
+                <button class="quiz-btn-next" id="quizNextBtn">Next</button>
             </div>
         </div>
     </div>
@@ -593,6 +827,279 @@ document.getElementById('fontBtn').onclick = () => {
 document.querySelector('.modal-close').onclick = () => {
     document.getElementById('fontModal').classList.remove('show');
 };
+
+// 퀴즈 모달
+let quizQuestions = [];
+let quizCurrentIndex = 0;
+let quizCanvas, quizGuideCanvas, quizCtx, quizGuideCtx;
+let quizIsDrawing = false;
+let quizDrawingSetup = false;  // 이벤트 리스너 설정 여부
+let quizCorrectCount = 0;  // 정답 개수
+let quizWrongCount = 0;  // 오답 개수
+
+document.getElementById('quizBtn').onclick = () => {
+    document.getElementById('quizModal').classList.add('show');
+    // 모달이 표시된 후 캔버스 초기화
+    setTimeout(() => {
+        initQuiz();
+    }, 50);
+};
+
+document.getElementById('quizModalClose').onclick = () => {
+    document.getElementById('quizModal').classList.remove('show');
+};
+
+function initQuiz() {
+    // 현재 카테고리의 문장 가져오기
+    let sentences = [];
+    if (currentCategory === 'situation' && currentSubCategory) {
+        sentences = sentenceData[currentSubCategory];
+    } else {
+        sentences = sentenceData[currentCategory];
+    }
+    
+    // 랜덤하게 5개 선택
+    const shuffled = [...sentences].sort(() => Math.random() - 0.5);
+    quizQuestions = shuffled.slice(0, Math.min(5, sentences.length));
+    quizCurrentIndex = 0;
+    quizCorrectCount = 0;
+    quizWrongCount = 0;
+    
+    // 캔버스 초기화 (매번 다시 설정)
+    quizCanvas = document.getElementById('quizDrawingCanvas');
+    quizGuideCanvas = document.getElementById('quizGuideCanvas');
+    
+    if (quizCanvas && quizGuideCanvas) {
+        quizCtx = quizCanvas.getContext('2d');
+        quizGuideCtx = quizGuideCanvas.getContext('2d');
+        
+        setupQuizCanvas();
+        if (!quizDrawingSetup) {  // 이벤트 리스너가 중복 등록되지 않도록
+            setupQuizDrawing();
+            quizDrawingSetup = true;
+        }
+    }
+    
+    updateQuizDisplay();
+}
+
+function setupQuizCanvas() {
+    const container = document.querySelector('.quiz-canvas-container');
+    const w = container.offsetWidth;
+    const h = w * 0.5;
+    const dpr = window.devicePixelRatio || 1;
+
+    quizCanvas.style.width = w + 'px';
+    quizCanvas.style.height = h + 'px';
+    quizCanvas.width = w * dpr;
+    quizCanvas.height = h * dpr;
+
+    quizGuideCanvas.style.width = w + 'px';
+    quizGuideCanvas.style.height = h + 'px';
+    quizGuideCanvas.width = w * dpr;
+    quizGuideCanvas.height = h * dpr;
+
+    // 드로잉 캔버스만 scale 적용
+    quizCtx.scale(dpr, dpr);
+    // 가이드 캔버스는 scale 적용 안 함 - 대신 물리적 크기 그대로 사용
+    // quizGuideCtx.scale(dpr, dpr);
+
+    quizCtx.lineWidth = 6;
+    quizCtx.lineCap = 'round';
+    quizCtx.lineJoin = 'round';
+    quizCtx.strokeStyle = '#0066ff';
+}
+
+function setupQuizDrawing() {
+    function getQuizPos(e) {
+        const r = quizCanvas.getBoundingClientRect();
+        const t = e.touches ? e.touches[0] : e;
+        return {
+            x: t.clientX - r.left,
+            y: t.clientY - r.top
+        };
+    }
+
+    function startQuizDrawing(e) {
+        e.preventDefault();
+        quizIsDrawing = true;
+        const p = getQuizPos(e);
+        quizCtx.beginPath();
+        quizCtx.moveTo(p.x, p.y);
+    }
+
+    function quizDraw(e) {
+        if (!quizIsDrawing) return;
+        e.preventDefault();
+        const p = getQuizPos(e);
+        quizCtx.lineTo(p.x, p.y);
+        quizCtx.stroke();
+    }
+
+    function stopQuizDrawing() {
+        quizIsDrawing = false;
+    }
+
+    quizCanvas.addEventListener('mousedown', startQuizDrawing);
+    quizCanvas.addEventListener('mousemove', quizDraw);
+    quizCanvas.addEventListener('mouseup', stopQuizDrawing);
+    quizCanvas.addEventListener('mouseout', stopQuizDrawing);
+    quizCanvas.addEventListener('touchstart', startQuizDrawing);
+    quizCanvas.addEventListener('touchmove', quizDraw);
+    quizCanvas.addEventListener('touchend', stopQuizDrawing);
+}
+
+function updateQuizDisplay() {
+    const question = quizQuestions[quizCurrentIndex];
+    
+    // 진행도 업데이트 (좌측: Question, 우측: Score)
+    document.getElementById('quizProgressLeft').textContent = 
+        `Question ${quizCurrentIndex + 1} / ${quizQuestions.length}`;
+    
+    const totalAnswered = quizCorrectCount + quizWrongCount;
+    if (totalAnswered > 0) {
+        document.getElementById('quizProgressRight').textContent = 
+            `Score: ${quizCorrectCount}/${totalAnswered}`;
+    } else {
+        document.getElementById('quizProgressRight').textContent = '';
+    }
+    
+    // 캔버스 클리어
+    if (quizCtx && quizCanvas) {
+        quizCtx.clearRect(0, 0, quizCanvas.width, quizCanvas.height);
+    }
+    
+    // 가이드 캔버스 숨기기 (Answer 버튼을 눌러야만 보임)
+    if (quizGuideCanvas) {
+        quizGuideCanvas.style.opacity = '0';
+    }
+    
+    // 가이드 업데이트 (미리 그려두기)
+    updateQuizGuide();
+}
+
+function updateQuizGuide() {
+    if (!quizGuideCtx || !quizGuideCanvas || !quizQuestions[quizCurrentIndex]) {
+        return;
+    }
+    
+    // 물리적 크기 사용 (scale이 적용되지 않았으므로)
+    const canvasWidth = quizGuideCanvas.width;
+    const canvasHeight = quizGuideCanvas.height;
+    
+    // 캔버스 전체를 클리어
+    quizGuideCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+    
+    const text = quizQuestions[quizCurrentIndex].korean;
+    
+    const currentFont = getComputedStyle(document.documentElement)
+        .getPropertyValue('--korean-font').trim() || 'Arial';
+    
+    // 7글자 이상이고 중간에 띄어쓰기가 있는 경우 2줄로 표시
+    if (text.length > 7 && text.includes(' ')) {
+        const spaceIndex = text.indexOf(' ', Math.floor(text.length / 2) - 2);
+        
+        if (spaceIndex > 0 && spaceIndex < text.length - 1) {
+            const line1 = text.substring(0, spaceIndex);
+            const line2 = text.substring(spaceIndex + 1);
+            
+            let fontSize = canvasHeight * 0.35;
+            quizGuideCtx.font = `bold ${fontSize}px ${currentFont}, Arial, sans-serif`;
+            
+            let line1Width = quizGuideCtx.measureText(line1).width;
+            let line2Width = quizGuideCtx.measureText(line2).width;
+            const maxTextWidth = Math.max(line1Width, line2Width);
+            const maxWidth = canvasWidth * 0.95;
+            
+            if (maxTextWidth > maxWidth) {
+                fontSize = fontSize * (maxWidth / maxTextWidth);
+                quizGuideCtx.font = `bold ${fontSize}px ${currentFont}, Arial, sans-serif`;
+            }
+            
+            fontSize = Math.max(25, Math.min(fontSize, canvasHeight * 0.4));
+            
+            quizGuideCtx.font = `bold ${fontSize}px ${currentFont}, Arial, sans-serif`;
+            quizGuideCtx.fillStyle = 'rgba(0, 242, 254, 0.4)';
+            quizGuideCtx.textAlign = 'center';
+            quizGuideCtx.textBaseline = 'middle';
+            
+            const lineSpacing = fontSize * 1.2;
+            const centerY = canvasHeight / 2;
+            
+            quizGuideCtx.fillText(line1, canvasWidth / 2, centerY - lineSpacing / 2);
+            quizGuideCtx.fillText(line2, canvasWidth / 2, centerY + lineSpacing / 2);
+            
+            return;
+        }
+    }
+    
+    // 1줄 표시
+    let fontSize = canvasHeight * 0.7;
+    quizGuideCtx.font = `bold ${fontSize}px ${currentFont}, Arial, sans-serif`;
+    
+    let textWidth = quizGuideCtx.measureText(text).width;
+    const maxWidth = canvasWidth * 0.95;
+    
+    if (textWidth > maxWidth) {
+        fontSize = fontSize * (maxWidth / textWidth);
+        quizGuideCtx.font = `bold ${fontSize}px ${currentFont}, Arial, sans-serif`;
+    }
+    
+    fontSize = Math.max(30, Math.min(fontSize, canvasHeight * 0.8));
+    
+    quizGuideCtx.font = `bold ${fontSize}px ${currentFont}, Arial, sans-serif`;
+    quizGuideCtx.fillStyle = 'rgba(0, 242, 254, 0.4)';
+    quizGuideCtx.textAlign = 'center';
+    quizGuideCtx.textBaseline = 'middle';
+    quizGuideCtx.fillText(text, canvasWidth / 2, canvasHeight / 2);
+}
+
+// 듣기 버튼
+document.getElementById('quizListenBtn').onclick = () => {
+    const question = quizQuestions[quizCurrentIndex];
+    const utterance = new SpeechSynthesisUtterance(question.korean);
+    utterance.lang = 'ko-KR';
+    utterance.rate = 0.8;
+    speechSynthesis.speak(utterance);
+};
+
+// 정답 보기 버튼 - 캔버스 가이드만 표시
+document.getElementById('quizAnswerBtn').onclick = () => {
+    if (quizGuideCanvas && quizGuideCtx) {
+        // 가이드를 다시 그리고 표시
+        updateQuizGuide();
+        quizGuideCanvas.style.opacity = '0.25';
+    }
+};
+
+// O 버튼 (정답)
+document.getElementById('quizCorrectBtn').onclick = () => {
+    quizCorrectCount++;
+    nextQuizQuestion();
+};
+
+// X 버튼 (오답)
+document.getElementById('quizWrongBtn').onclick = () => {
+    quizWrongCount++;
+    nextQuizQuestion();
+};
+
+// Next 버튼
+document.getElementById('quizNextBtn').onclick = () => {
+    nextQuizQuestion();
+};
+
+function nextQuizQuestion() {
+    if (quizCurrentIndex < quizQuestions.length - 1) {
+        quizCurrentIndex++;
+        updateQuizDisplay();
+    } else {
+        // 퀴즈 종료
+        const total = quizCorrectCount + quizWrongCount;
+        alert(`Quiz completed!\n\nScore: ${quizCorrectCount}/${total} (${Math.round(quizCorrectCount/total*100)}%)`);
+        document.getElementById('quizModal').classList.remove('show');
+    }
+}
 
 document.querySelectorAll('.font-option').forEach(opt => {
     opt.onclick = function() {
