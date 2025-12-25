@@ -850,17 +850,23 @@ document.getElementById('quizModalClose').onclick = () => {
 };
 
 function initQuiz() {
-    // 현재 카테고리의 문장 가져오기
-    let sentences = [];
-    if (currentCategory === 'situation' && currentSubCategory) {
-        sentences = sentenceData[currentSubCategory];
-    } else {
-        sentences = sentenceData[currentCategory];
-    }
+    // 모든 카테고리의 문장 가져오기
+    let allSentences = [];
+    
+    // greetings, basic 카테고리
+    allSentences = allSentences.concat(sentenceData.greetings);
+    allSentences = allSentences.concat(sentenceData.basic);
+    
+    // situation 카테고리의 모든 서브 카테고리
+    allSentences = allSentences.concat(sentenceData.travel);
+    allSentences = allSentences.concat(sentenceData.business);
+    allSentences = allSentences.concat(sentenceData.restaurant);
+    allSentences = allSentences.concat(sentenceData.appointment);
+    allSentences = allSentences.concat(sentenceData.hospital);
     
     // 랜덤하게 5개 선택
-    const shuffled = [...sentences].sort(() => Math.random() - 0.5);
-    quizQuestions = shuffled.slice(0, Math.min(5, sentences.length));
+    const shuffled = [...allSentences].sort(() => Math.random() - 0.5);
+    quizQuestions = shuffled.slice(0, Math.min(5, allSentences.length));
     quizCurrentIndex = 0;
     quizCorrectCount = 0;
     quizWrongCount = 0;
