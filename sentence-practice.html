@@ -866,7 +866,7 @@ function initQuiz() {
     
     // 랜덤하게 5개 선택
     const shuffled = [...allSentences].sort(() => Math.random() - 0.5);
-    quizQuestions = shuffled.slice(0, Math.min(5, allSentences.length));
+    quizQuestions = shuffled.slice(0, Math.min(10, allSentences.length));
     quizCurrentIndex = 0;
     quizCorrectCount = 0;
     quizWrongCount = 0;
