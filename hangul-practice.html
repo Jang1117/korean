@@ -265,7 +265,7 @@
 
         <div class="character-display">
             <div class="current-character" id="currentCharacter">ㄱ<span class="check-mark" id="checkMark">✓</span></div>
-            <div class="character-info" id="characterInfo">g/k</div>
+            <div class="character-info" id="characterInfo">giyeok (g/k)</div>
         </div>
 
         <div class="canvas-container">
@@ -353,7 +353,7 @@
                         <div class="quiz-stat"><div class="quiz-stat-label">Correct</div><div class="quiz-stat-value correct" id="quizCorrect">0</div></div>
                         <div class="quiz-stat"><div class="quiz-stat-label">Wrong</div><div class="quiz-stat-value wrong" id="quizWrong">0</div></div>
                     </div>
-                    <div class="quiz-question" id="quizQuestion">g/k</div>
+                    <div class="quiz-question" id="quizQuestion">giyeok (g/k)</div>
                     <div class="quiz-answer-area">
                         <div class="quiz-answer" id="quizAnswer" style="visibility: hidden;">ㄱ</div>
                     </div>
@@ -401,28 +401,28 @@
         };
 
         // ========================================
-        // 자음 데이터 (기본 14개 + 쌍자음)
+        // 자음 데이터 (기본 14개 + 쌍자음) - 이미지 기준으로 수정
         // ========================================
         const consonantData = {
-            'ㄱ': { romaji: 'g/k', strokes: '① Horizontal line (left to right)\n② Vertical line (top to bottom)', sound: 'like "g" in "go"', sub: ['ㄲ'] },
-            'ㄲ': { romaji: 'kk', strokes: '① First ㄱ\n② Second ㄱ', sound: 'tense "k"' },
-            'ㄴ': { romaji: 'n', strokes: '① Vertical line (top to bottom)\n② Horizontal line (left to right)', sound: 'like "n" in "no"' },
-            'ㄷ': { romaji: 'd/t', strokes: '① Horizontal line (top, left to right)\n② Vertical line (right side, top to bottom)\n③ Horizontal line (bottom, left to right)', sound: 'like "d" in "do"', sub: ['ㄸ'] },
-            'ㄸ': { romaji: 'tt', strokes: '① First ㄷ\n② Second ㄷ', sound: 'tense "t"' },
-            'ㄹ': { romaji: 'r/l', strokes: '① Horizontal line (top, left to right)\n② Vertical line (right, top to bottom)\n③ Horizontal line (middle, left to right)\n④ Vertical line (left, top to bottom)\n⑤ Horizontal line (bottom, left to right)', sound: 'like "r" or "l"' },
-            'ㅁ': { romaji: 'm', strokes: '① Vertical line (left, top to bottom)\n② Horizontal line (top, left to right)\n③ Vertical line (right, top to bottom)\n④ Horizontal line (bottom, left to right)', sound: 'like "m" in "mom"' },
-            'ㅂ': { romaji: 'b/p', strokes: '① Vertical line (left, top to bottom)\n② Horizontal line (top, left to right)\n③ Vertical line (right, top to bottom)\n④ Horizontal line (bottom, left to right)', sound: 'like "b" in "book"', sub: ['ㅃ'] },
-            'ㅃ': { romaji: 'pp', strokes: '① First ㅂ\n② Second ㅂ', sound: 'tense "p"' },
-            'ㅅ': { romaji: 's', strokes: '① Diagonal line (left, right to left downward)\n② Diagonal line (right, left to right downward)', sound: 'like "s" in "see"', sub: ['ㅆ'] },
-            'ㅆ': { romaji: 'ss', strokes: '① First ㅅ\n② Second ㅅ', sound: 'tense "s"' },
-            'ㅇ': { romaji: 'ng/silent', strokes: '① Circle (start from top, clockwise)', sound: 'silent or "ng"' },
-            'ㅈ': { romaji: 'j', strokes: '① Horizontal line (top, left to right)\n② Diagonal line (left, right to left downward)\n③ Diagonal line (right, left to right downward)', sound: 'like "j" in "jump"', sub: ['ㅉ'] },
-            'ㅉ': { romaji: 'jj', strokes: '① First ㅈ\n② Second ㅈ', sound: 'tense "j"' },
-            'ㅊ': { romaji: 'ch', strokes: '① Vertical line (top, top to bottom)\n② Horizontal line (middle, left to right)\n③ Diagonal line (left, right to left downward)\n④ Diagonal line (right, left to right downward)', sound: 'like "ch" in "church"' },
-            'ㅋ': { romaji: 'k', strokes: '① Horizontal line (left to right)\n② Vertical line (top to bottom)\n③ Horizontal line (right extension, left to right)', sound: 'like "k" in "kite"' },
-            'ㅌ': { romaji: 't', strokes: '① Horizontal line (very top, left to right)\n② Horizontal line (top, left to right)\n③ Vertical line (right, top to bottom)\n④ Horizontal line (bottom, left to right)', sound: 'like "t" in "top"' },
-            'ㅍ': { romaji: 'p', strokes: '① Horizontal line (very top, left to right)\n② Vertical line (left, top to bottom)\n③ Vertical line (right, top to bottom)\n④ Horizontal line (bottom, left to right)', sound: 'like "p" in "pop"' },
-            'ㅎ': { romaji: 'h', strokes: '① Vertical line (very top, top to bottom)\n② Horizontal line (top, left to right)\n③ Circle (start from top, clockwise)', sound: 'like "h" in "house"' }
+            'ㄱ': { romaji: 'giyeok (g/k)', strokes: '① Horizontal line (left to right)\n② Vertical line (top to bottom)', sound: 'like "g" in "go"', sub: ['ㄲ'] },
+            'ㄲ': { romaji: 'ssang giyeok (kk)', strokes: '① First ㄱ\n② Second ㄱ', sound: 'tense "k"' },
+            'ㄴ': { romaji: 'nieun (n)', strokes: '① Vertical line (top to bottom)\n② Horizontal line (left to right)', sound: 'like "n" in "no"' },
+            'ㄷ': { romaji: 'digeut (d/t)', strokes: '① Horizontal line (top, left to right)\n② Vertical line (right side, top to bottom)\n③ Horizontal line (bottom, left to right)', sound: 'like "d" in "do"', sub: ['ㄸ'] },
+            'ㄸ': { romaji: 'ssang digeut (tt)', strokes: '① First ㄷ\n② Second ㄷ', sound: 'tense "t"' },
+            'ㄹ': { romaji: 'rieul (r/l)', strokes: '① Horizontal line (top, left to right)\n② Vertical line (right, top to bottom)\n③ Horizontal line (middle, left to right)\n④ Vertical line (left, top to bottom)\n⑤ Horizontal line (bottom, left to right)', sound: 'like "r" or "l"' },
+            'ㅁ': { romaji: 'mieum (m)', strokes: '① Vertical line (left, top to bottom)\n② Horizontal line (top, left to right)\n③ Vertical line (right, top to bottom)\n④ Horizontal line (bottom, left to right)', sound: 'like "m" in "mom"' },
+            'ㅂ': { romaji: 'bieup (b/p)', strokes: '① Vertical line (left, top to bottom)\n② Horizontal line (top, left to right)\n③ Vertical line (right, top to bottom)\n④ Horizontal line (bottom, left to right)', sound: 'like "b" in "book"', sub: ['ㅃ'] },
+            'ㅃ': { romaji: 'ssang bieup (pp)', strokes: '① First ㅂ\n② Second ㅂ', sound: 'tense "p"' },
+            'ㅅ': { romaji: 'shiot (s)', strokes: '① Diagonal line (left, right to left downward)\n② Diagonal line (right, left to right downward)', sound: 'like "s" in "see"', sub: ['ㅆ'] },
+            'ㅆ': { romaji: 'ssang shiot (ss)', strokes: '① First ㅅ\n② Second ㅅ', sound: 'tense "s"' },
+            'ㅇ': { romaji: 'ieung (ng/silent)', strokes: '① Circle (start from top, clockwise)', sound: 'silent or "ng"' },
+            'ㅈ': { romaji: 'jieut (j)', strokes: '① Horizontal line (top, left to right)\n② Diagonal line (left, right to left downward)\n③ Diagonal line (right, left to right downward)', sound: 'like "j" in "jump"', sub: ['ㅉ'] },
+            'ㅉ': { romaji: 'ssang jieut (jj)', strokes: '① First ㅈ\n② Second ㅈ', sound: 'tense "j"' },
+            'ㅊ': { romaji: 'chieut (ch)', strokes: '① Vertical line (top, top to bottom)\n② Horizontal line (middle, left to right)\n③ Diagonal line (left, right to left downward)\n④ Diagonal line (right, left to right downward)', sound: 'like "ch" in "church"' },
+            'ㅋ': { romaji: 'kieuk (k)', strokes: '① Horizontal line (left to right)\n② Vertical line (top to bottom)\n③ Horizontal line (right extension, left to right)', sound: 'like "k" in "kite"' },
+            'ㅌ': { romaji: 'tieut (t)', strokes: '① Horizontal line (very top, left to right)\n② Horizontal line (top, left to right)\n③ Vertical line (right, top to bottom)\n④ Horizontal line (bottom, left to right)', sound: 'like "t" in "top"' },
+            'ㅍ': { romaji: 'pieup (p)', strokes: '① Horizontal line (very top, left to right)\n② Vertical line (left, top to bottom)\n③ Vertical line (right, top to bottom)\n④ Horizontal line (bottom, left to right)', sound: 'like "p" in "pop"' },
+            'ㅎ': { romaji: 'hieut (h)', strokes: '① Vertical line (very top, top to bottom)\n② Horizontal line (top, left to right)\n③ Circle (start from top, clockwise)', sound: 'like "h" in "house"' }
         };
         const mainConsonants = ['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ','ㅅ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 
