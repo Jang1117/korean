@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Practice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hi+Melody&family=Gamja+Flower&family=Gaegu&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --korean-font: Arial;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        h1 { color: #00f2fe; font-size: 22px; flex: 1; }
+        .back-button, .font-button {
+            background: #e9ecef;
+            border: none;
+            border-radius: 8px;
+            width: 36px; height: 36px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            text-decoration: none;
+        }
+        .font-button { background: linear-gradient(135deg, #845ef7 0%, #7950f2 100%); color: white; }
+        .back-button:hover, .font-button:hover { transform: scale(1.08); }
+        .category-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .category-btn {
+            padding: 10px 5px;
+            background: #e9ecef;
+            color: #495057;
+            border: 2px solid transparent;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .category-btn.active {
+            background: #00f2fe;
+            color: white;
+            border-color: #00f2fe;
+        }
+        .sub-category-container {
+            display: none;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        .sub-category-container.show { display: grid; }
+        .sub-btn {
+            padding: 8px 4px;
+            background: #f1f3f5;
+            color: #495057;
+            border: 2px solid transparent;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .sub-btn.active {
+            background: #00d4ff;
+            color: white;
+            border-color: #00d4ff;
+        }
+        .progress {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .progress.checked::after { content: " ✓"; color: #51cf66; font-weight: bold; }
+        .sentence-display { text-align: center; margin-bottom: 20px; }
+        .current-sentence {
+            font-size: 32px;
+            color: #00f2fe;
+            margin-bottom: 10px;
+            font-weight: bold;
+            line-height: 1.4;
+            font-family: var(--korean-font), Arial, sans-serif;
+        }
+        .sentence-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .info-row { margin-bottom: 8px; font-size: 14px; }
+        .info-label { color: #666; margin-right: 8px; font-weight: bold; }
+        .info-value { color: #333; }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 50%;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: 3px solid #00f2fe;
+            border-radius: 10px;
+            background: white;
+            touch-action: none;
+        }
+        .guide-canvas { opacity: 0.25; pointer-events: none; }  /* 더 투명하게 */
+
+        .controls, .controls-three {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .controls { grid-template-columns: 1fr 1fr; }
+        .controls-three { grid-template-columns: repeat(3, 1fr); }
+
+        button {
+            padding: 14px 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .btn-clear { background: #ff6b9d; color: white; }
+        .btn-clear:hover { background: #ff5252; }
+        .btn-next, .btn-prev { background: #51cf66; color: white; }
+        .btn-next:hover, .btn-prev:hover { background: #40c057; }
+        .btn-show-guide { background: #ffd43b; color: #333; }
+        .btn-show-guide:hover { background: #fcc419; }
+        .btn-done { background: #845ef7; color: white; }
+        .btn-done.checked { background: #51cf66; }
+
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7);
+            justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 90vw;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 2px solid #f1f3f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e9ecef;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .font-option {
+            padding: 12px;
+            margin: 8px 0;
+            background: #f8f9fa;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .font-option:hover { background: #e9ecef; }
+        .font-option.active { background: #00f2fe; color: white; border-color: #00f2fe; }
+        .font-option-preview { font-size: 32px; margin: 8px 0; font-weight: bold; }
+
+        @media (max-width: 480px) {
+            .current-sentence { font-size: 26px; }
+            .font-option-preview { font-size: 26px; }
+            .sub-category-container { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <a href="korean-index.html" class="back-button">←</a>
+        <h1>Sentence Practice</h1>
+        <button class="font-button" id="fontBtn">F</button>
+    </div>
+
+    <div class="category-selector">
+        <button class="category-btn active" data-category="greetings">Greetings</button>
+        <button class="category-btn" data-category="basic">Basic</button>
+        <button class="category-btn" id="situationMainBtn">Situation</button>
+    </div>
+
+    <div class="sub-category-container" id="subCategories">
+        <button class="sub-btn active" data-sub="travel">여행</button>
+        <button class="sub-btn" data-sub="business">비즈니스</button>
+        <button class="sub-btn" data-sub="restaurant">식당</button>
+        <button class="sub-btn" data-sub="appointment">약속</button>
+        <button class="sub-btn" data-sub="hospital">병원</button>
+    </div>
+
+    <div class="progress" id="progressText">1 / 10</div>
+
+    <div class="sentence-display">
+        <div class="current-sentence" id="currentSentence">안녕하세요</div>
+        <div class="sentence-info">
+            <div class="info-row">
+                <span class="info-label">Romanization:</span>
+                <span id="romanization">annyeonghaseyo</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">English:</span>
+                <span id="english">Hello</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="drawingCanvas"></canvas>
+        <canvas id="guideCanvas" class="guide-canvas"></canvas>
+    </div>
+
+    <div class="controls">
+        <button class="btn-prev">◀ Previous</button>
+        <button class="btn-next">Next ▶</button>
+    </div>
+
+    <div class="controls controls-three">
+        <button class="btn-clear">🗑 Clear</button>
+        <button class="btn-show-guide">👁 Guide</button>
+        <button class="btn-done" id="doneBtn">✓ Done</button>
+    </div>
+</div>
+
+<!-- Font Modal -->
+<div class="modal-overlay" id="fontModal">
+    <div class="modal-content" style="max-width:380px;">
+        <div class="modal-header">
+            <h2>🔤 Font</h2>
+            <button class="modal-close">×</button>
+        </div>
+        <div style="padding:20px;">
+            <div class="font-option active" data-font="Arial">
+                <div class="font-option-preview" style="font-family:Arial;">안녕하세요</div>
+                <div>Default (Arial)</div>
+            </div>
+            <div class="font-option" data-font="'Hi Melody'">
+                <div class="font-option-preview" style="font-family:'Hi Melody';">안녕하세요</div>
+                <div>Hi Melody</div>
+            </div>
+            <div class="font-option" data-font="'Gamja Flower'">
+                <div class="font-option-preview" style="font-family:'Gamja Flower';">안녕하세요</div>
+                <div>Gamja Flower</div>
+            </div>
+            <div class="font-option" data-font="'Gaegu'">
+                <div class="font-option-preview" style="font-family:'Gaegu';">안녕하세요</div>
+                <div>Gaegu</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 데이터 (기존 그대로)
+const sentenceData = {
+    greetings: [
+        { korean: '안녕하세요', rom: 'annyeonghaseyo', eng: 'Hello (formal)' },
+        { korean: '안녕', rom: 'annyeong', eng: 'Hi / Bye (informal)' },
+        { korean: '잘 지냈어요?', rom: 'jal jinaesseoyo?', eng: 'How have you been?' },
+        { korean: '오랜만이에요', rom: 'oraenmanieyo', eng: 'Long time no see' },
+        { korean: '만나서 반가워요', rom: 'mannaseo bangawoyo', eng: 'Nice to meet you' },
+        { korean: '안녕히 가세요', rom: 'annyeonghi gaseyo', eng: 'Goodbye (to person leaving)' },
+        { korean: '안녕히 계세요', rom: 'annyeonghi gyeseyo', eng: 'Goodbye (to person staying)' },
+        { korean: '좋은 아침이에요', rom: 'joheun achimieyo', eng: 'Good morning' },
+        { korean: '잘 잤어요?', rom: 'jal jasseoyo?', eng: 'Did you sleep well?' },
+        { korean: '오늘도 화이팅!', rom: 'oneuldo hwaiting!', eng: 'Fighting today too!' }
+    ],
+    basic: [
+        { korean: '감사합니다', rom: 'gamsahamnida', eng: 'Thank you (formal)' },
+        { korean: '고마워요', rom: 'gomawoyo', eng: 'Thank you (polite)' },
+        { korean: '미안합니다', rom: 'mianhamnida', eng: 'I\'m sorry (formal)' },
+        { korean: '괜찮아요', rom: 'gwaenchanayo', eng: 'It\'s okay' },
+        { korean: '네', rom: 'ne', eng: 'Yes' },
+        { korean: '아니요', rom: 'aniyo', eng: 'No' },
+        { korean: '잘 부탁드려요', rom: 'jal butakdeuryeoyo', eng: 'Please take care of me' },
+        { korean: '천만에요', rom: 'cheonmaneyo', eng: 'You\'re welcome' },
+        { korean: '축하해요', rom: 'chukhahaeyo', eng: 'Congratulations' },
+        { korean: '수고하세요', rom: 'sugohaseyo', eng: 'Good work / Take care' }
+    ],
+    travel: [
+        { korean: '여기서 서울역까지 어떻게 가요?', rom: 'yeogiseo seoullyeokkkaji eotteoke gayo?', eng: 'How do I get to Seoul Station from here?' },
+        { korean: '택시 타고 싶어요', rom: 'taeksi tago sipeoyo', eng: 'I want to take a taxi' },
+        { korean: '이 호텔 주소예요', rom: 'i hotel jusoyeyo', eng: 'This is the hotel address' },
+        { korean: '사진 한 장 찍어주세요', rom: 'sajin han jang jjigeojuseyo', eng: 'Please take a photo for me' },
+        { korean: '화장실이 어디예요?', rom: 'hwajangsiri eodiyeyo?', eng: 'Where is the restroom?' },
+        { korean: '이거 얼마예요?', rom: 'igeo eolmayeyo?', eng: 'How much is this?' },
+        { korean: '영수증 주세요', rom: 'yeongsujeung juseyo', eng: 'Please give me a receipt' },
+        { korean: '지하철 어디서 타요?', rom: 'jihacheol eodiseo tayo?', eng: 'Where do I get on the subway?' },
+        { korean: '공항까지 얼마나 걸려요?', rom: 'gonghangkkaji eolmana geollyeoyo?', eng: 'How long does it take to the airport?' },
+        { korean: '감사합니다, 잘 부탁드려요', rom: 'gamsahamnida, jal butakdeuryeoyo', eng: 'Thank you, please take care of me' }
+    ],
+    business: [
+        { korean: '회의 시작하겠습니다', rom: 'hoeui sijakhagetseumnida', eng: 'Let’s start the meeting' },
+        { korean: '자료를 보내드릴게요', rom: 'jaryoreul bonaedeurilgeyo', eng: 'I’ll send you the materials' },
+        { korean: '계약서 확인 부탁드립니다', rom: 'gyeyakseo hwagin butakdeurimnida', eng: 'Please review the contract' },
+        { korean: '가격을 조정할 수 있을까요?', rom: 'gagyeogeul jojeonghal su isseulkkayo?', eng: 'Can we adjust the price?' },
+        { korean: '다음 미팅은 언제예요?', rom: 'daeum mitingeun eonjeyeyo?', eng: 'When is the next meeting?' },
+        { korean: '좋은 제안 감사합니다', rom: 'joheun jean gamsahamnida', eng: 'Thank you for the good suggestion' },
+        { korean: '협력 기대하겠습니다', rom: 'hyeomnyeok gidaehagetseumnida', eng: 'I look forward to our cooperation' },
+        { korean: '오늘 수고 많으셨습니다', rom: 'oneul sugo maneusyeotseumnida', eng: 'Thank you for your hard work today' },
+        { korean: '명함 주세요', rom: 'myeongham juseyo', eng: 'Please give me your business card' },
+        { korean: '질문 있으신가요?', rom: 'jilmun isseusin-gayo?', eng: 'Do you have any questions?' }
+    ],
+    restaurant: [
+        { korean: '메뉴판 주세요', rom: 'menyupan juseyo', eng: 'Please give me the menu' },
+        { korean: '이거 추천해요', rom: 'igeo chucheonhaeyo', eng: 'I recommend this' },
+        { korean: '여기서 제일 맛있는 거 주세요', rom: 'yeogiseo jeil masinneun geo juseyo', eng: 'Please give me the best dish here' },
+        { korean: '맵게 해주세요', rom: 'maepge haejuseyo', eng: 'Please make it spicy' },
+        { korean: '물 더 주세요', rom: 'mul deo juseyo', eng: 'More water, please' },
+        { korean: '계산할게요', rom: 'gyesanhalgeyo', eng: 'I’ll pay now' },
+        { korean: '맛있었습니다', rom: 'masisseotseumnida', eng: 'It was delicious' },
+        { korean: '포장해 주세요', rom: 'pojanghae juseyo', eng: 'Please pack it to go' },
+        { korean: '밥 더 주세요', rom: 'bap deo juseyo', eng: 'More rice, please' },
+        { korean: '잘 먹겠습니다', rom: 'jal meokgetseumnida', eng: 'I will eat well' }
+    ],
+    appointment: [
+        { korean: '내일 몇 시에 만나요?', rom: 'naeil myeot sie mannayo?', eng: 'What time shall we meet tomorrow?' },
+        { korean: '약속 시간 지킬게요', rom: 'yaksok sigan jikilgeyo', eng: 'I’ll keep the appointment time' },
+        { korean: '늦어서 미안해요', rom: 'neujeoseo mianhaeyo', eng: 'Sorry I’m late' },
+        { korean: '장소 바꿀까요?', rom: 'jangso bakkulkka yo?', eng: 'Shall we change the place?' },
+        { korean: '취소해야겠어요', rom: 'chwisohae yagesseoyo', eng: 'I think I have to cancel' },
+        { korean: '다음에 다시 약속해요', rom: 'daeume dasi yaksokhaeyo', eng: 'Let’s make another appointment next time' },
+        { korean: '몇 시까지 가능해요?', rom: 'myeot sikkaji ganeunghaeyo?', eng: 'Until what time are you available?' },
+        { korean: '약속 잊지 않을게요', rom: 'yaksok ijji anheulgeyo', eng: 'I won’t forget the appointment' },
+        { korean: '만나서 좋았어요', rom: 'mannaseo joasseoyo', eng: 'It was nice meeting you' },
+        { korean: '시간 맞춰서 갈게요', rom: 'sigan machwoseo galgeyo', eng: 'I’ll come on time' }
+    ],
+    hospital: [
+        { korean: '어디가 아프세요?', rom: 'eodiga apeuseyo?', eng: 'Where does it hurt?' },
+        { korean: '열이 있어요', rom: 'yeori isseoyo', eng: 'I have a fever' },
+        { korean: '감기 걸린 것 같아요', rom: 'gamgi geollin geot gatayo', eng: 'I think I have a cold' },
+        { korean: '처방전 주세요', rom: 'cheobangjeon juseyo', eng: 'Please give me a prescription' },
+        { korean: '약국 어디예요?', rom: 'yakguk eodiyeyo?', eng: 'Where is the pharmacy?' },
+        { korean: '주사 맞아야 하나요?', rom: 'jusa majaya hanayo?', eng: 'Do I need an injection?' },
+        { korean: '언제 다시 오면 되나요?', rom: 'eonje dasi omyeon doenayo?', eng: 'When should I come back?' },
+        { korean: '알레르기 있어요', rom: 'allereugi isseoyo', eng: 'I have an allergy' },
+        { korean: '피곤해요', rom: 'pigonhaeyo', eng: 'I feel tired' },
+        { korean: '빨리 나았으면 좋겠어요', rom: 'ppalli naasseumyeon jokesseoyo', eng: 'I hope I get better soon' }
+    ]
+};
+
+// 상태 변수
+let currentCategory = 'greetings';
+let currentSubCategory = null;
+let currentIndex = 0;
+let isDrawing = false;
+let showGuide = true;
+let checkedSentences = {};
+
+try {
+    const saved = localStorage.getItem('sentenceChecked');
+    if (saved) checkedSentences = JSON.parse(saved);
+} catch(e) {}
+
+// 캔버스 초기화
+const canvas = document.getElementById('drawingCanvas');
+const guideCanvas = document.getElementById('guideCanvas');
+const ctx = canvas.getContext('2d');
+const guideCtx = guideCanvas.getContext('2d');
+
+function initCanvas() {
+    const container = document.querySelector('.canvas-container');
+    const w = container.offsetWidth;
+    const h = w * 0.5;
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+
+    guideCanvas.style.width = w + 'px';
+    guideCanvas.style.height = h + 'px';
+    guideCanvas.width = w * dpr;
+    guideCanvas.height = h * dpr;
+
+    ctx.scale(dpr, dpr);
+    guideCtx.scale(dpr, dpr);
+
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#0066ff';
+
+    updateGuide();
+}
+
+function updateGuide() {
+    guideCtx.clearRect(0, 0, guideCanvas.width / window.devicePixelRatio, guideCanvas.height / window.devicePixelRatio);
+    const text = getCurrentSentence().korean;
+    
+    const canvasWidth = guideCanvas.width / window.devicePixelRatio;
+    const canvasHeight = guideCanvas.height / window.devicePixelRatio;
+    
+    // CSS 변수 값을 실제로 가져오기
+    const currentFont = getComputedStyle(document.documentElement).getPropertyValue('--korean-font').trim() || 'Arial';
+    
+    // 7글자 이상이고 중간에 띄어쓰기가 있는 경우 2줄로 표시
+    if (text.length > 7 && text.includes(' ')) {
+        const spaceIndex = text.indexOf(' ', Math.floor(text.length / 2) - 2);
+        
+        if (spaceIndex > 0 && spaceIndex < text.length - 1) {
+            const line1 = text.substring(0, spaceIndex);
+            const line2 = text.substring(spaceIndex + 1);
+            
+            // 2줄 텍스트 크기 계산
+            let fontSize = canvasHeight * 0.35;
+            guideCtx.font = `bold ${fontSize}px ${currentFont}, Arial, sans-serif`;
+            
+            let line1Width = guideCtx.measureText(line1).width;
+            let line2Width = guideCtx.measureText(line2).width;
+            const maxTextWidth = Math.max(line1Width, line2Width);
+            const maxWidth = canvasWidth * 0.95;
+            
+            if (maxTextWidth > maxWidth) {
+                fontSize = fontSize * (maxWidth / maxTextWidth);
+                guideCtx.font = `bold ${fontSize}px ${currentFont}, Arial, sans-serif`;
+            }
+            
+            fontSize = Math.max(25, Math.min(fontSize, canvasHeight * 0.4));
+            
+            guideCtx.font = `bold ${fontSize}px ${currentFont}, Arial, sans-serif`;
+            guideCtx.fillStyle = 'rgba(0, 242, 254, 0.4)';  // 투명도 적용
+            guideCtx.textAlign = 'center';
+            guideCtx.textBaseline = 'middle';
+            
+            const lineSpacing = fontSize * 1.2;
+            const centerY = canvasHeight / 2;
+            
+            guideCtx.fillText(line1, canvasWidth / 2, centerY - lineSpacing / 2);
+            guideCtx.fillText(line2, canvasWidth / 2, centerY + lineSpacing / 2);
+            
+            return;
+        }
+    }
+    
+    // 1줄 표시 (기존 로직)
+    let fontSize = canvasHeight * 0.7;
+    guideCtx.font = `bold ${fontSize}px ${currentFont}, Arial, sans-serif`;
+    
+    let textWidth = guideCtx.measureText(text).width;
+    const maxWidth = canvasWidth * 0.95;
+    
+    if (textWidth > maxWidth) {
+        fontSize = fontSize * (maxWidth / textWidth);
+        guideCtx.font = `bold ${fontSize}px ${currentFont}, Arial, sans-serif`;
+    }
+    
+    fontSize = Math.max(30, Math.min(fontSize, canvasHeight * 0.8));
+    
+    guideCtx.font = `bold ${fontSize}px ${currentFont}, Arial, sans-serif`;
+    guideCtx.fillStyle = 'rgba(0, 242, 254, 0.4)';  // 투명도 적용
+    guideCtx.textAlign = 'center';
+    guideCtx.textBaseline = 'middle';
+    guideCtx.fillText(text, canvasWidth / 2, canvasHeight / 2);
+}
+function getCurrentSentence() {
+    if (currentCategory === 'situation' && currentSubCategory) {
+        return sentenceData[currentSubCategory][currentIndex];
+    }
+    return sentenceData[currentCategory][currentIndex];
+}
+
+function getCategoryLength() {
+    if (currentCategory === 'situation' && currentSubCategory) {
+        return sentenceData[currentSubCategory].length;
+    }
+    return sentenceData[currentCategory].length;
+}
+
+function getKey() {
+    if (currentCategory === 'situation' && currentSubCategory) {
+        return `situation-${currentSubCategory}-${currentIndex}`;
+    }
+    return `${currentCategory}-${currentIndex}`;
+}
+
+function updateDisplay() {
+    const s = getCurrentSentence();
+    document.getElementById('currentSentence').textContent = s.korean;
+    document.getElementById('romanization').textContent = s.rom;
+    document.getElementById('english').textContent = s.eng;
+
+    const progress = document.getElementById('progressText');
+    progress.textContent = `${currentIndex + 1} / ${getCategoryLength()}`;
+    
+    const checked = !!checkedSentences[getKey()];
+    progress.classList.toggle('checked', checked);
+    document.getElementById('doneBtn').classList.toggle('checked', checked);
+}
+
+// 드로잉 함수들 (기존과 동일)
+function getPos(e) {
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return {
+        x: t.clientX - r.left,
+        y: t.clientY - r.top
+    };
+}
+
+function startDrawing(e) { e.preventDefault(); isDrawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+function draw(e) { if(!isDrawing) return; e.preventDefault(); const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }
+function stopDrawing() { isDrawing = false; }
+function clearCanvas() { ctx.clearRect(0,0,canvas.width,canvas.height); }
+function toggleGuide() {
+    showGuide = !showGuide;
+    guideCanvas.style.opacity = showGuide ? '0.25' : '0';
+}
+
+// 페이지 이동
+function nextSentence() {
+    currentIndex = (currentIndex + 1) % getCategoryLength();
+    updateDisplay();
+    clearCanvas();
+    updateGuide();
+}
+
+function prevSentence() {
+    currentIndex = (currentIndex - 1 + getCategoryLength()) % getCategoryLength();
+    updateDisplay();
+    clearCanvas();
+    updateGuide();
+}
+
+function toggleDone() {
+    const key = getKey();
+    checkedSentences[key] = !checkedSentences[key];
+    localStorage.setItem('sentenceChecked', JSON.stringify(checkedSentences));
+    updateDisplay();
+}
+
+// 폰트 선택 (기존과 동일)
+document.getElementById('fontBtn').onclick = () => {
+    document.getElementById('fontModal').classList.add('show');
+};
+
+document.querySelector('.modal-close').onclick = () => {
+    document.getElementById('fontModal').classList.remove('show');
+};
+
+document.querySelectorAll('.font-option').forEach(opt => {
+    opt.onclick = function() {
+        const font = this.dataset.font;
+        document.documentElement.style.setProperty('--korean-font', font);
+        document.querySelectorAll('.font-option').forEach(o => o.classList.remove('active'));
+        this.classList.add('active');
+        updateGuide();
+        try { localStorage.setItem('sentenceFont', font); } catch(e){}
+    };
+});
+
+const savedFont = localStorage.getItem('sentenceFont');
+if (savedFont) {
+    document.documentElement.style.setProperty('--korean-font', savedFont);
+    const activeOpt = document.querySelector(`.font-option[data-font="${savedFont.replace(/'/g,'')}"]`);
+    if (activeOpt) activeOpt.classList.add('active');
+}
+
+// 카테고리 선택 (Greetings, Basic)
+document.querySelectorAll('.category-btn[data-category]').forEach(btn => {
+    btn.onclick = function() {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentCategory = this.dataset.category;
+        currentIndex = 0;
+        currentSubCategory = null;
+        document.getElementById('subCategories').classList.remove('show');
+        updateDisplay();
+        clearCanvas();
+        updateGuide();
+    };
+});
+
+// Situation 버튼 클릭 → 서브 메뉴 토글
+document.getElementById('situationMainBtn').onclick = function() {
+    const subContainer = document.getElementById('subCategories');
+    const isOpening = !subContainer.classList.contains('show');
+    
+    // 다른 카테고리 버튼 비활성화
+    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    
+    // sub 버튼 초기화
+    document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+    
+    if (isOpening) {
+        // 서브 메뉴 열기
+        subContainer.classList.add('show');
+        currentCategory = 'situation';
+        currentSubCategory = 'travel';
+        currentIndex = 0;
+        document.querySelector('[data-sub="travel"]').classList.add('active');
+        updateDisplay();
+        clearCanvas();
+        updateGuide();
+    } else {
+        // 서브 메뉴 닫기
+        subContainer.classList.remove('show');
+        currentSubCategory = null;
+    }
+};
+
+// ★★★ 중요 ★★★ Sub 카테고리 버튼 클릭 이벤트 (여기서 해결!)
+document.querySelectorAll('.sub-btn[data-sub]').forEach(btn => {
+    btn.onclick = function() {
+        document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        currentCategory = 'situation';
+        currentSubCategory = this.dataset.sub;
+        currentIndex = 0;
+        
+        updateDisplay();
+        clearCanvas();
+        updateGuide();
+    };
+});
+
+// 이벤트 리스너 연결
+canvas.addEventListener('mousedown', startDrawing);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', stopDrawing);
+canvas.addEventListener('mouseout', stopDrawing);
+canvas.addEventListener('touchstart', startDrawing);
+canvas.addEventListener('touchmove', draw);
+canvas.addEventListener('touchend', stopDrawing);
+
+document.querySelector('.btn-next').onclick = nextSentence;
+document.querySelector('.btn-prev').onclick = prevSentence;
+document.querySelector('.btn-clear').onclick = clearCanvas;
+document.querySelector('.btn-show-guide').onclick = toggleGuide;
+document.getElementById('doneBtn').onclick = toggleDone;
+
+window.addEventListener('resize', initCanvas);
+
+// 초기 실행
+initCanvas();
+updateDisplay();
+</script>
+</body>
+</html>
