@@ -367,6 +367,7 @@
         }
         
         .quiz-btn-correct {
+            flex: 1;
             padding: 14px;
             background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
             color: white;
@@ -379,6 +380,7 @@
         }
         
         .quiz-btn-wrong {
+            flex: 1;
             padding: 14px;
             background: linear-gradient(135deg, #ff6b9d 0%, #ff5252 100%);
             color: white;
@@ -428,8 +430,9 @@
     <div class="header">
         <a href="index.html" class="back-button">←</a>
         <h1>Sentence Practice</h1>
-        <button class="quiz-button" id="quizBtn">Q</button>
         <button class="font-button" id="fontBtn">F</button>
+		<button class="quiz-button" id="quizBtn">Q</button>
+
     </div>
 
     <div class="category-selector">
@@ -525,15 +528,14 @@
                 <canvas id="quizGuideCanvas"></canvas>
             </div>
             
-            <div class="quiz-btn-row">
+            <div class="quiz-btn-row" id="quizButtonsInitial">
                 <button class="quiz-btn-listen" id="quizListenBtn">🔊 Listen</button>
                 <button class="quiz-btn-answer" id="quizAnswerBtn">Answer</button>
             </div>
             
-            <div class="quiz-btn-row-2">
+            <div class="quiz-btn-row" id="quizButtonsAnswer" style="display: none;">
                 <button class="quiz-btn-correct" id="quizCorrectBtn">O</button>
                 <button class="quiz-btn-wrong" id="quizWrongBtn">X</button>
-                <button class="quiz-btn-next" id="quizNextBtn">Next</button>
             </div>
         </div>
     </div>
@@ -871,6 +873,10 @@ function initQuiz() {
     quizCorrectCount = 0;
     quizWrongCount = 0;
     
+    // 버튼 초기화: Listen/Answer 보이고 O/X 숨기기
+    document.getElementById('quizButtonsInitial').style.display = 'flex';
+    document.getElementById('quizButtonsAnswer').style.display = 'none';
+    
     // 캔버스 초기화 (매번 다시 설정)
     quizCanvas = document.getElementById('quizDrawingCanvas');
     quizGuideCanvas = document.getElementById('quizGuideCanvas');
@@ -1076,6 +1082,9 @@ document.getElementById('quizAnswerBtn').onclick = () => {
         updateQuizGuide();
         quizGuideCanvas.style.opacity = '0.25';
     }
+    // 버튼 전환: Listen/Answer 숨기고 O/X 보이기
+    document.getElementById('quizButtonsInitial').style.display = 'none';
+    document.getElementById('quizButtonsAnswer').style.display = 'flex';
 };
 
 // O 버튼 (정답)
@@ -1090,15 +1099,13 @@ document.getElementById('quizWrongBtn').onclick = () => {
     nextQuizQuestion();
 };
 
-// Next 버튼
-document.getElementById('quizNextBtn').onclick = () => {
-    nextQuizQuestion();
-};
-
 function nextQuizQuestion() {
     if (quizCurrentIndex < quizQuestions.length - 1) {
         quizCurrentIndex++;
         updateQuizDisplay();
+        // 버튼 초기화: Listen/Answer 보이고 O/X 숨기기
+        document.getElementById('quizButtonsInitial').style.display = 'flex';
+        document.getElementById('quizButtonsAnswer').style.display = 'none';
     } else {
         // 퀴즈 종료
         const total = quizCorrectCount + quizWrongCount;
