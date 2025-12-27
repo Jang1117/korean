@@ -152,7 +152,7 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             border: 3px solid #f5576c; border-radius: 10px; background: white; touch-action: none;
         }
-        .guide-canvas { opacity: 0.15; }
+        .guide-canvas { opacity: 0.15; pointer-events: none; }
 
         .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
         .controls-three { display: grid; grid-template-columns: repeat(3, 1fr); }
@@ -505,13 +505,18 @@
 
 		function initCanvas() {
 			const container = document.querySelector('.canvas-container');
-			const width = container.offsetWidth;
+			let width = container.offsetWidth;
+			if (width === 0) width = 220; // fallback 크기
 			const height = width * 0.8; // 세로를 가로의 80%로 설정 (20% 감소)
 			canvas.width = width; 
 			canvas.height = height;
 			guideCanvas.width = width; 
 			guideCanvas.height = height;
-            ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#f5576c';
+			// 캔버스 크기 변경 후 컨텍스트 속성 재설정 (크기 변경시 리셋됨)
+			ctx.lineWidth = 8; 
+			ctx.lineCap = 'round'; 
+			ctx.lineJoin = 'round'; 
+			ctx.strokeStyle = '#f5576c';
             drawGuideCharacter();
         }
 
@@ -780,9 +785,13 @@
         function markQuizWrong() { quizWrong++; document.getElementById('quizWrong').textContent = quizWrong; nextQuiz(); }
 
         // Events
-        canvas.addEventListener('mousedown', startDrawing); canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing); canvas.addEventListener('mouseout', stopDrawing);
-        canvas.addEventListener('touchstart', startDrawing); canvas.addEventListener('touchmove', draw); canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('mousedown', startDrawing); 
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing); 
+        canvas.addEventListener('mouseout', stopDrawing);
+        canvas.addEventListener('touchstart', startDrawing, { passive: false }); 
+        canvas.addEventListener('touchmove', draw, { passive: false }); 
+        canvas.addEventListener('touchend', stopDrawing);
         window.addEventListener('resize', () => { const w = showGuide; initCanvas(); showGuide = w; guideCanvas.style.opacity = showGuide ? '0.3' : '0'; });
 
         // Init
