@@ -114,31 +114,45 @@
             font-size: 9px; color: white; display: flex; align-items: center; justify-content: center;
         }
 
-        .character-display { text-align: center; margin-bottom: 12px; }
+		/* 한글 글자 표시를 숨기고 정보를 강조하도록 수정 */
+		.character-display { 
+			text-align: center; 
+			margin-bottom: 20px; 
+			padding: 10px;
+			background: #fff5f6;
+			border-radius: 15px;
+		}
 
-        .current-character {
-            font-size: 65px; color: #f5576c; margin-bottom: 5px; font-weight: bold;
-            position: relative; display: inline-block;
-            font-family: var(--korean-font), var(--korean-font-fallback);
-        }
+		/* 기존 큰 글자 제거 또는 크기 최소화 */
+		.current-character {
+			display: none; /* 한글 글자는 버튼에 이미 있으므로 숨김 */
+		}
         .check-mark {
             position: absolute; top: -8px; right: -8px; background: #51cf66;
             color: white; width: 26px; height: 26px; border-radius: 50%;
             display: none; align-items: center; justify-content: center; font-size: 16px;
         }
         .check-mark.show { display: flex; }
-        .character-info { font-size: 16px; color: #666; }
-
-        .canvas-container {
-            position: relative; width: 100%; max-width: 220px;
-            margin: 0 auto 12px; aspect-ratio: 1 / 1;
-            border-radius: 10px; overflow: hidden;
-        }
+		.character-info { 
+				font-size: 24px; /* 발음 기호 크기 확대 */
+				font-weight: bold;
+				color: #f5576c;
+				letter-spacing: 1px;
+			}
+		.canvas-container {
+			position: relative; 
+			width: 100%; 
+			max-width: 220px;
+			margin: 0 auto 12px; 
+			aspect-ratio: 1.25 / 1; /* 가로 대비 세로 비율을 줄임 (기존 1/1) */
+			border-radius: 10px; 
+			overflow: hidden;
+		}
         canvas {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             border: 3px solid #f5576c; border-radius: 10px; background: white; touch-action: none;
         }
-        .guide-canvas { opacity: 0.3; pointer-events: none; }
+        .guide-canvas { opacity: 0.15; }
 
         .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
         .controls-three { display: grid; grid-template-columns: repeat(3, 1fr); }
@@ -150,12 +164,21 @@
         .btn-check { background: #845ef7; color: white; }
         .btn-check.checked { background: #51cf66; }
 
-        .stroke-order {
-            margin-top: 10px; padding: 10px; background: #e7f5ff;
-            border-radius: 8px; font-size: 12px; color: #1864ab;
-            line-height: 1.5; white-space: pre-line;
-			min-height: 69px; /* ← 추가 */
-        }
+		.stroke-order {
+			margin-top: 10px; 
+			padding: 10px; 
+			background: #e7f5ff;
+			border-radius: 8px; 
+			font-size: 13px; /* 가독성을 위해 크기 약간 조정 */
+			color: #1864ab;
+			line-height: 1.5; 
+			white-space: pre-line;
+			
+			/* 높이 고정 설정 */
+			height: 100px;      /* 5줄 분량의 높이 */
+			overflow-y: auto;   /* 혹시 5줄이 넘어가면 내부 스크롤 생성 */
+			display: block;
+		}
 
         /* Modal */
         .modal-overlay {
@@ -263,15 +286,14 @@
         <div class="character-selector" id="characterSelector"></div>
         <div class="sub-selector" id="subSelector"></div>
 
-        <div class="character-display">
-            <div class="current-character" id="currentCharacter">ㄱ<span class="check-mark" id="checkMark">✓</span></div>
-            <div class="character-info" id="characterInfo">giyeok (g/k)</div>
-        </div>
+		<div class="character-display">
+			<div class="character-info" id="characterInfo">giyeok (g/k)</div>
+			<div id="currentCharacter" style="display:none;">ㄱ</div> </div>
 
-        <div class="canvas-container">
-            <canvas id="drawingCanvas"></canvas>
-            <canvas id="guideCanvas" class="guide-canvas"></canvas>
-        </div>
+		<div class="canvas-container">
+			<canvas id="drawingCanvas"></canvas>
+			<canvas id="guideCanvas" class="guide-canvas"></canvas>
+		</div>
 
         <div class="controls">
             <button class="btn-prev" onclick="prevChar()">◀ Prev</button>
@@ -481,26 +503,37 @@
             return all;
         }
 
-        function initCanvas() {
-            const container = document.querySelector('.canvas-container');
-            const size = container.offsetWidth;
-            canvas.width = size; canvas.height = size;
-            guideCanvas.width = size; guideCanvas.height = size;
+		function initCanvas() {
+			const container = document.querySelector('.canvas-container');
+			const width = container.offsetWidth;
+			const height = width * 0.8; // 세로를 가로의 80%로 설정 (20% 감소)
+			canvas.width = width; 
+			canvas.height = height;
+			guideCanvas.width = width; 
+			guideCanvas.height = height;
             ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#f5576c';
             drawGuideCharacter();
         }
 
-        function drawGuideCharacter() {
-            if (!guideCanvas.width) return;
-            guideCtx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
-            const char = getCurrentChar();
-            const fontSize = guideCanvas.width * 0.65;
-            guideCtx.font = FontManager.getCanvasFont(fontSize);
-            guideCtx.fillStyle = '#f5576c';
-            guideCtx.textAlign = 'center';
-            guideCtx.textBaseline = 'middle';
-            guideCtx.fillText(char, guideCanvas.width / 2, guideCanvas.height / 2);
-        }
+		function drawGuideCharacter() {
+			if (!guideCanvas.width) return;
+			guideCtx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
+			const char = getCurrentChar();
+			
+			// 1. 폰트 크기를 캔버스 높이의 80% -> 70%로 조정 (치우침 방지)
+			const fontSize = guideCanvas.height * 0.9; 
+			guideCtx.font = FontManager.getCanvasFont(fontSize);
+			guideCtx.fillStyle = '#f5576c';
+			guideCtx.textAlign = 'center';
+			guideCtx.textBaseline = 'middle'; 
+
+			// 2. 세로 위치 보정 (centerY)
+			// 기본은 height / 2 이지만, 여전히 위로 치우쳐 보인다면 +5 ~ +10 정도를 더해줍니다.
+			const centerX = guideCanvas.width / 2;
+			const centerY = (guideCanvas.height / 2) + (fontSize * 0.05); // 폰트 크기의 5%만큼 아래로 보정
+
+			guideCtx.fillText(char, centerX, centerY);
+		}
 
         function getPos(e) {
             const rect = canvas.getBoundingClientRect();
@@ -644,6 +677,10 @@
             
             document.getElementById('currentCharacter').innerHTML = `${char}<span class="check-mark" id="checkMark">✓</span>`;
             document.getElementById('characterInfo').textContent = charData.romaji;
+			
+			// 획순 텍스트 업데이트
+			const strokeOrderElement = document.getElementById('strokeOrder');
+			strokeOrderElement.textContent = charData.strokes;
             document.getElementById('strokeOrder').textContent = charData.strokes;
             
             const isChecked = !!checkedChars[getCharKey(char)];
@@ -757,6 +794,20 @@
             updateDisplay();
         }
         init();
+		
+		window.onclick = function(event) {
+			const fontModal = document.getElementById('fontModal');
+			const chartModal = document.getElementById('chartModal');
+			const quizModal = document.getElementById('quizModal');
+
+			if (event.target == fontModal) {
+				closeFontSelector();
+			} else if (event.target == chartModal) {
+				closeChart();
+			} else if (event.target == quizModal) {
+				closeQuiz();
+			}
+		}
     </script>
 </body>
 </html>
