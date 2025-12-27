@@ -383,11 +383,13 @@
                         <canvas id="quizDrawingCanvas" class="quiz-canvas"></canvas>
                         <canvas id="quizGuideCanvas" class="quiz-canvas quiz-guide-canvas"></canvas>
                     </div>
-                    <div class="quiz-buttons">
+                    <div class="quiz-buttons" id="quizButtonsInitial">
                         <button class="quiz-btn quiz-btn-show" id="showAnswerBtn" onclick="showAnswer()">Show</button>
-                        <button class="quiz-btn" onclick="markQuizCorrect()">✓ O</button>
-                        <button class="quiz-btn" onclick="markQuizWrong()">✗ X</button>
                         <button class="quiz-btn" onclick="nextQuiz()">Next</button>
+                    </div>
+                    <div class="quiz-buttons" id="quizButtonsAnswer" style="display: none;">
+                        <button class="quiz-btn" onclick="markQuizCorrect()">O</button>
+                        <button class="quiz-btn" onclick="markQuizWrong()">X</button>
                     </div>
                 </div>
             </div>
@@ -762,7 +764,8 @@
             document.getElementById('quizQuestion').textContent = currentQuizChar.romaji;
             document.getElementById('quizAnswer').textContent = currentQuizChar.char;
             document.getElementById('quizAnswer').style.visibility = 'hidden';
-            document.getElementById('showAnswerBtn').style.display = 'inline-block';
+            document.getElementById('quizButtonsInitial').style.display = 'flex';
+            document.getElementById('quizButtonsAnswer').style.display = 'none';
             if (quizCtx) quizCtx.clearRect(0, 0, quizCanvas.width, quizCanvas.height);
             if (quizGuideCanvas) quizGuideCanvas.style.opacity = '0';
         }
@@ -778,7 +781,8 @@
         }
         function showAnswer() {
             document.getElementById('quizAnswer').style.visibility = 'visible';
-            document.getElementById('showAnswerBtn').style.display = 'none';
+            document.getElementById('quizButtonsInitial').style.display = 'none';
+            document.getElementById('quizButtonsAnswer').style.display = 'flex';
             drawQuizGuide(); quizGuideCanvas.style.opacity = '0.3';
         }
         function markQuizCorrect() { quizCorrect++; document.getElementById('quizCorrect').textContent = quizCorrect; nextQuiz(); }
