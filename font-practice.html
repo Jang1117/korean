@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>정밀 필사 원고지 - 한국 대표 시 전문 모음</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo&family=Nanum+Gothic&family=Nanum+Pen+Script&family=Nanum+Brush+Script&family=Gowun+Batang&family=Gowun+Dodum&family=Song+Myung&family=Black+Han+Sans&family=Do+Hyeon&family=Gamja+Flower&family=Hi+Melody&family=Sunflower:wght@300&family=Jua&family=Yeon+Sung&family=Kirang+Haerang&family=Poor+Story&family=Gaegu&family=Cute+Font&family=Single+Day&family=Dongle&family=Gugi&family=Dokdo&family=Stylish&family=Hahmlet&family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --grid-red: #ff4d4d; 
+            --cell-size: 13.5mm; 
+            --spacer-size: 1.5mm; 
+        }
+        body { background: #525659; margin: 0; display: flex; flex-direction: column; align-items: center; padding: 10px; font-family: 'Nanum Gothic', sans-serif; }
+        .no-print { background: white; padding: 20px; border-radius: 8px; width: 950px; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        textarea { width: 100%; height: 120px; margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; font-size: 14px; resize: vertical; }
+        .controls { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .select-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        select { padding: 8px; border-radius: 4px; border: 1px solid #ccc; max-width: 250px; }
+
+        #pages-container { display: flex; flex-direction: column; gap: 20px; }
+        .paper {
+            background: white;
+            width: 297mm;
+            height: 210mm;
+            padding: 10mm 12.5mm;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            page-break-after: always;
+        }
+
+        .header-info { width: 100%; display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 4mm; }
+        .title-line { flex-grow: 1; border-bottom: 1px solid #333; margin-right: 15mm; font-size: 14pt; padding-bottom: 2px; }
+        
+        .manuscript-grid {
+            display: grid;
+            grid-template-columns: repeat(20, var(--cell-size));
+            border-top: 1.5px solid var(--grid-red);
+            border-left: 1.5px solid var(--grid-red);
+            margin: 0 auto;
+        }
+
+        .cell {
+            width: var(--cell-size);
+            height: var(--cell-size);
+            border-right: 1.5px solid var(--grid-red);
+            border-bottom: 1.5px solid var(--grid-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(0, 0, 0, 0.3);
+            font-size: 9.5mm;
+            line-height: 1;
+            box-sizing: border-box;
+        }
+
+        .spacer-row {
+            grid-column: span 20;
+            height: var(--spacer-size);
+            border-left: 1.5px solid var(--grid-red);
+            border-right: 1.5px solid var(--grid-red);
+            border-bottom: 1.5px solid var(--grid-red);
+        }
+
+        .footer-info { width: 100%; display: flex; justify-content: space-between; font-size: 10pt; color: #888; padding-top: 2mm; }
+
+        @media print {
+            @page { size: A4 landscape; margin: 0; }
+            body { background: none; padding: 0; }
+            .no-print { display: none; }
+            .paper { box-shadow: none; margin: 0; border: none; }
+        }
+
+        button { background: #e11d48; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="no-print">
+        <h3 style="margin:0 0 10px 0">정밀 필사 도구 (한국 대표 시 전문 수록)</h3>
+        <textarea id="textInput" placeholder="내용을 입력하거나 아래 예시 전문을 선택하세요."></textarea>
+        <div class="controls">
+            <div class="select-group">
+                <label>서체:</label>
+                <select id="fontSelect">
+                    <optgroup label="명조/바탕">
+                        <option value="'Nanum Myeongjo'">나눔명조</option>
+                        <option value="'Gowun Batang'">고운바탕</option>
+                        <option value="'Song Myung'">송명체</option>
+                        <option value="'Hahmlet'">함렛</option>
+                    </optgroup>
+                    <optgroup label="고딕/돋움">
+                        <option value="'Nanum Gothic'">나눔고딕</option>
+                        <option value="'Gowun Dodum'">고운돋움</option>
+                        <option value="'Black Han Sans'">검은고딕</option>
+                    </optgroup>
+                    <optgroup label="손글씨/개성">
+                        <option value="'Nanum Pen Script'">나눔손글씨 (펜)</option>
+                        <option value="'Nanum Brush Script'">나눔손글씨 (붓)</option>
+                        <option value="'Gamja Flower'">감자꽃체</option>
+                        <option value="'Hi Melody'">하이멜로디</option>
+                        <option value="'Jua'">주아체</option>
+                    </optgroup>
+                </select>
+
+                <label style="margin-left:10px;">예시 시 전문:</label>
+                <select id="exampleSelect">
+                    <option value="">-- 직접 입력 --</option>
+                    <option value="계절이 지나가는 하늘에는 가을로 가득 차 있습니다. 나는 아무 걱정도 없이 가을 속의 별들을 다 헤일 듯합니다. 가슴속에 하나 둘 새겨지는 별을 이제 다 못 헤는 것은 쉬이 아침이 오는 까닭이요 내일 밤이 남은 까닭이요 아직 나의 청춘이 다하지 않은 까닭입니다. 별 하나에 추억과 별 하나에 사랑과 별 하나에 쓸쓸함과 별 하나에 동경과 별 하나에 시와 별 하나에 어머니, 어머니, 어머님, 나는 별 하나에 아름다운 말 한마디씩 불러 봅니다. 소학교 때 책상을 같이 했던 아이들의 이름과, 패, 경, 옥 이런 이국 소녀들의 이름과, 벌써 아기 어머니 된 계집애들의 이름과, 가난한 이웃 사람들의 이름과, 비둘기, 강아지, 토끼, 노새, 노루, 프랑시스 잼, 라이너 마리아 릴케, 이런 시인의 이름을 불러 봅니다. 이네들은 너무나 멀리 있습니다. 별이 아스라이 멀듯이, 어머님, 그리고 당신은 멀리 북간도에 계십니다. 나는 무엇인지 그리워 이 많은 별빛이 내린 언덕 위에 내 이름자를 써 보고, 흙으로 덮어 버리었습니다. 딴은 밤을 새워 우는 벌레는 부끄러운 이름을 슬퍼하는 까닭입니다. 그러나 겨울이 지나고 나의 별에도 봄이 오면 무덤 위에 파란 잔디가 피어나듯이 내 이름자 묻힌 언덕 위에도 자랑처럼 풀이 무성할 게외다.">별 헤는 밤 (윤동주 - 전문)</option>
+                    <option value="나 보기가 역겨워 가실 때에는 말없이 고이 보내 드리오리다. 영변에 약산 진달래꽃 아름 따다 가실 길에 뿌리오리다. 가시는 걸음 걸음 놓인 그 꽃을 사뿐히 즈려밟고 가시옵소서. 나 보기가 역겨워 가실 때에는 죽어도 아니 눈물 흘리오리다.">진달래꽃 (김소월 - 전문)</option>
+                    <option value="하늘로 돌아가리라. 새벽빛 와 닿으면 스러지는 이슬 더불어 손에 손을 잡고, 하늘로 돌아가리라. 노을빛 함께 단둘이서 기슭에서 놀다가 구름 손짓하면은, 하늘로 돌아가리라. 아름다운 이 세상 소풍 끝내는 날, 가서, 아름다웠더라고 말하리라……">귀천 (천상병 - 전문)</option>
+                    <option value="강나루 건너서 밀밭 길을 구름에 달 가듯이 가는 나그네. 길은 외줄기 남도 삼백 리. 술 익는 마을마다 타는 저녁 놀. 구름에 달 가듯이 가는 나그네.">나그네 (박목월 - 전문)</option>
+                    <option value="가야 할 때가 언제인가를 분명히 알고 가는 이의 뒷모습은 얼마나 아름다운가. 봄 한 철 격정을 인내한 나의 사랑은 지고 있다. 분분한 낙화…… 결별이 이룩하는 축복에 싸여 지금은 가야 할 때. 무성한 녹음과 그리고 머지않아 열매 맺는 가을을 향하여 나의 청춘은 꽃답게 죽는다. 헤어지자 섬세한 손길을 흔들며 하롱하롱 꽃잎이 지는 어느 날. 나의 사랑, 나의 결별. 샘터에 물 고이듯 성숙하는 내 영혼의 슬픈 눈.">낙화 (이형기 - 전문)</option>
+                    <option value="동해 물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세 무궁화 삼천리 화려 강산 대한 사람 대한으로 길이 보전하세 남산 위에 저 소나무 철갑을 두른 듯 바람 서리 불변함은 우리 기상일세 무궁화 삼천리 화려 강산 대한 사람 대한으로 길이 보전하세 가을 하늘 공활한데 높고 구름 없이 밝은 달은 우리 가슴 일편단심일세 무궁화 삼천리 화려 강산 대한 사람 대한으로 길이 보전하세 이 기상과 이 맘으로 충성을 다하여 괴로우나 즐거우나 나라 사랑하세 무궁화 삼천리 화려 강산 대한 사람 대한으로 길이 보전하세">애국가 (1-4절 전문)</option>
+                </select>
+            </div>
+            <button onclick="window.print()">A4 가로 인쇄</button>
+        </div>
+    </div>
+
+    <div id="pages-container"></div>
+
+    <script>
+        const pagesContainer = document.getElementById('pages-container');
+        const textInput = document.getElementById('textInput');
+        const fontSelect = document.getElementById('fontSelect');
+        const exampleSelect = document.getElementById('exampleSelect');
+
+        function createPage(pageNum) {
+            const paper = document.createElement('div');
+            paper.className = 'paper';
+            paper.style.fontFamily = fontSelect.value;
+            paper.innerHTML = `
+                <div class="header-info"><div class="title-line" id="title-${pageNum}">제목: </div><div class="page-no">No. ${pageNum}</div></div>
+                <div class="manuscript-body"><div class="manuscript-grid" id="grid-${pageNum}"></div></div>
+                <div class="footer-info"><span>20 X 10 (200자)</span><span>ⓒ 필사 연습 도구</span></div>
+            `;
+            const grid = paper.querySelector(`#grid-${pageNum}`);
+            for (let r = 0; r < 10; r++) {
+                for (let c = 0; c < 20; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    grid.appendChild(cell);
+                }
+                if (r < 9) {
+                    const spacer = document.createElement('div');
+                    spacer.className = 'spacer-row';
+                    grid.appendChild(spacer);
+                }
+            }
+            return paper;
+        }
+
+        function render() {
+            pagesContainer.innerHTML = '';
+            // 줄바꿈 공백 등으로 치환하여 한 줄로 처리
+            const text = textInput.value.replace(/\n/g, " ").replace(/\s+/g, " ").trim();
+            const chars = text.split("");
+            
+            const charsPerPage = 100; // 1:1 줄 비우기 모드 (200칸 중 100자 배치)
+            const pageCount = Math.max(1, Math.ceil(chars.length / charsPerPage));
+
+            for (let p = 0; p < pageCount; p++) {
+                const page = createPage(p + 1);
+                pagesContainer.appendChild(page);
+                
+                const titleElement = page.querySelector('.title-line');
+                if (exampleSelect.value !== "") {
+                    titleElement.textContent = "제목: " + exampleSelect.options[exampleSelect.selectedIndex].text.split(' (')[0];
+                }
+
+                const pageData = chars.slice(p * charsPerPage, (p + 1) * charsPerPage);
+                pageData.forEach((char, i) => {
+                    const row = Math.floor(i / 20);
+                    const col = i % 20;
+                    const targetRow = row * 2; 
+                    const cellIndex = (targetRow * 21) + col;
+                    
+                    const gridItems = page.querySelector('.manuscript-grid').children;
+                    if (gridItems[cellIndex]) {
+                        gridItems[cellIndex].textContent = char;
+                    }
+                });
+            }
+        }
+
+        textInput.addEventListener('input', render);
+        fontSelect.addEventListener('change', render);
+        exampleSelect.addEventListener('change', (e) => {
+            textInput.value = e.target.value;
+            render();
+        });
+
+        render();
+    </script>
+</body>
+</html>
